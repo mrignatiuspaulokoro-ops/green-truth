@@ -39,11 +39,11 @@ function broadcast(room,obj){
   const payload=JSON.stringify(obj);
   room.players.forEach(p=>send(p.ws,obj));
 }
-function stateFor(room){
+function stateFor(room, viewerId){
   const q = room.questions[room.round-1];
   return {
     type:"state", code:room.code, status:room.status, round:room.round,
-    totalRounds:5, hostId:room.hostId,
+    totalRounds:5, hostId:room.hostId, selfId:viewerId,
     question: (room.status==="playing"||room.status==="results") ? {
       claim:q.claim, topic:q.topic
     }:null,
@@ -54,7 +54,7 @@ function stateFor(room){
     winner:room.winner
   };
 }
-function sync(room){ room.players.forEach(p=>send(p.ws,stateFor(room))); }
+function sync(room){ room.players.forEach(p=>send(p.ws,stateFor(room,p.id))); }
 function startGame(room){
   room.status="playing"; room.round=1; room.reveal=null; room.winner=null;
   room.questions=QUESTIONS.slice().sort(()=>Math.random()-.5).slice(0,5);
