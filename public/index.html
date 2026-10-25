@@ -24,7 +24,7 @@ function connect(action,data){
   if(ws&&ws.readyState===1){ws.send(JSON.stringify({action,...data}));return;}
   ws=new WebSocket((location.protocol==="https:"?"wss://":"ws://")+location.host);
   ws.onopen=()=>ws.send(JSON.stringify({action,...data}));
-  ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==="state"){state=m;session={...session,code:m.code,id:session?.id||m.hostId};localStorage.setItem("gtSession",JSON.stringify(session));render();}if(m.type==="error")showError(m.message);};
+  ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==="state"){state=m;session={...session,code:m.code,id:m.selfId};localStorage.setItem("gtSession",JSON.stringify(session));render();}if(m.type==="error")showError(m.message);};
   ws.onclose=()=>{if(state&&state.status!=="finished")showError("Connection lost. Refresh to reconnect.");};
 }
 function showError(msg){let x=document.getElementById("err");if(x)x.textContent=msg;else app.insertAdjacentHTML("afterbegin",`<div id="err" class="error">${esc(msg)}</div>`);}
